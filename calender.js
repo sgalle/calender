@@ -59,11 +59,12 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
         const selYear = document.getElementById(selYearId).value;
         const selMonth = Number(document.getElementById(selMonthId).value);
         const selMonthDays =  (selMonth == 1 && isLeapYear(selYear) ? 29 : MONTHS_DAYS[selMonth + 1]);
-        const firstKwOfMonth = getKw(tmpDate);
         
         tmpDate.setFullYear(selYear);
         tmpDate.setMonth(selMonth);
-   
+        
+        const firstKwOfMonth = getKw(tmpDate);
+
         function createKwField(cw){
             let divKw = document.createElement("DIV");
             divKw.innerHTML = "<span>"+cw+"</span>";
@@ -96,15 +97,18 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
         console.log(firstKwOfMonth, firstMonthWeekday, selMonthDays)
         
         let dateCounter = 0;
-        let weekdayIter = 0;
+        let weekdayIter = 1;
 
         for(weekdayIter;weekdayIter <= 7; weekdayIter++){
             if(firstMonthWeekday == weekdayIter)
                 break;
-    
-            let date = lastMonthDay - weekdayIter;
+
+            let date = (lastMonthDay+1) - weekdayIter;
             dates.prepend(createDayField(date, weekdayIter, -1));
         }
+        
+        dates.prepend(createKwField(firstKwOfMonth));
+
         let dayMonthIndicator = 0;
         for(let row=0; row < 6;row++){
             for(let weekday = weekdayIter; weekday <= 7; weekday++){
