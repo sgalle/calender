@@ -1,21 +1,93 @@
 
+:root{
+    --default-color: black;
+    --default-bg-color: white;
+    --field-sundays-bg-color: rgb(178, 194, 194);
+    --field-other-months-bg-color: rgb(121, 119, 119,0.7);
+    --field-other-months-color: white;
+    --field-border-color: transparent;
+}
 body{
     background-color: rgb(110, 92, 92);
 }
-.calender{
+.dates{
     display: grid;
-    grid-template-columns: repeat(7, auto);
+    grid-template-columns: 1.5rem repeat(7, auto);
     gap: 0.2rem;
 }
-.calender > div{
-    background-color: white;
+.dates > div{
+    background-color: var(--default-bg-color);
     border-radius: 0.5rem;
-    height: 5rem;
     padding: 0.25rem;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    justify-items: center;
+    border-style: solid;
+    border-color: var(--field-border-color);
+    border-width: 0.15rem;
 }
-.calender > div:not(.cur-month-day){
-    background-color: rgb(121, 119, 119,0.7);
-    color: white;
+.dates > div:nth-child(8n-7){
+    aspect-ratio: auto !important;
+    align-self: normal;
+    background-color: var(--default-bg-color) !important;
+    color: var(--default-color) !important;
+}
+.dates > div:nth-child(8n-7) > span::before{
+    content: 'KW';
+    margin-top: 0.25rem;
+}
+.dates > div:nth-child(8n-7) > span{
+    writing-mode: sideways-lr;
+    text-orientation: mixed;
+    text-align: center;
+    font-size: small;
+}
+.dates > div:nth-child(8n){
+    background-color: var(--field-sundays-bg-color);
+}
+.dates > div > span{
+    user-select: none;
+}
+.dates > div:not(.cur-month-day){
+    background-color: var(--field-other-months-bg-color);
+    color: var(--field-other-months-color);
+}
+.date-simple{
+    display: grid;
+    /* justify-items: center; */
+    align-content: center;
+    align-items: center;
+}
+.control{
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.5rem;
+    background-color: var(--default-bg-color);
+    border-bottom-style: double;
+    margin-bottom: 0.1rem;
+    display: grid;
+}
+.control > div{
+    display: grid;
+}
+.control > div:first-child{
+    justify-content: center;
+    grid-template-columns: auto auto;
+}
+.control > div:first-child > select{
+    background-color: var(--default-bg-color);
+    border-style: none;
+    cursor: pointer;
+}
+.control > div:last-child {
+    grid-template-columns: 1.5rem repeat(7, auto);
+    justify-items: center;
+    align-items: end;
+}
+.cur-day > span{
+    text-decoration: underline;
+    font-weight: bolder;
+    text-decoration-style: double;
 }
 main{
 }
