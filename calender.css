@@ -6,7 +6,7 @@
     --field-other-months-bg-color: rgb(121, 119, 119,0.7);
     --field-other-months-color: white;
     --field-border-color: transparent;
-    --prefix-KW: 'KW';
+    --prefix-CW: 'KW';
 }
 body{
     background-color: rgb(110, 92, 92);
@@ -34,7 +34,7 @@ body{
     color: var(--default-color) !important;
 }
 .dates > div:nth-child(8n-7) > span::before{
-    content: var(--prefix-KW);
+    content: var(--prefix-CW);
     margin-top: 0.25rem;
 }
 .dates > div:nth-child(8n-7) > span{
