@@ -6,6 +6,7 @@
     --field-other-months-bg-color: rgb(121, 119, 119,0.7);
     --field-other-months-color: white;
     --field-border-color: transparent;
+    --prefix-KW: 'KW';
 }
 body{
     background-color: rgb(110, 92, 92);
@@ -33,7 +34,7 @@ body{
     color: var(--default-color) !important;
 }
 .dates > div:nth-child(8n-7) > span::before{
-    content: 'KW';
+    content: var(--prefix-KW);
     margin-top: 0.25rem;
 }
 .dates > div:nth-child(8n-7) > span{
@@ -51,6 +52,25 @@ body{
 .dates > div:not(.cur-month-day){
     background-color: var(--field-other-months-bg-color);
     color: var(--field-other-months-color);
+}
+.cur-month-day:hover{
+    font-size: larger;
+    cursor: pointer;
+    padding: 0;
+}
+.cur-month-day > div{
+    position: absolute;
+    z-index: 1;
+    background-color: inherit;
+    width: 5rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.5rem;
+    border-style: groove;
+    justify-content: center;
+    align-content: center;
+}
+.cur-month-day:hover > div{
+    display: grid !important;
 }
 .date-simple{
     display: grid;
@@ -84,10 +104,14 @@ body{
     justify-items: center;
     align-items: end;
 }
-.cur-day > span{
+.cur-day{
+}
+.cur-day > span, .cur-day > div{
     text-decoration: underline;
     font-weight: bolder;
     text-decoration-style: double;
+    font-size: larger;
+    position: absolute;
 }
 main{
 }

@@ -77,13 +77,13 @@ function initCalender(cssDateStyle = "date-simple"){
     let lastMonthDay = tmpDate.getDate();
     
     let dateCounter = 0;
-    
+
     function createKwField(row){
         let divKw = document.createElement("DIV");
         divKw.innerHTML = "<span>"+(firstKwOfMonth + row)+"</span>";
         return divKw;
     }
-    function createDayField(date, weekday, dayMonth=0){
+    function createDayField(date, weekday, dayMonth=0, cb_onclick=null){
         if(weekday < 1) return createKwField(0);
         let divDay = document.createElement("DIV");
         divDay.id = calender.id +"-datefield-"+tmpDate.getFullYear()+"-"+curMonth+"-"+date;
@@ -91,8 +91,9 @@ function initCalender(cssDateStyle = "date-simple"){
         divDay.classList.add(dayMonth == 0 ? "cur-month-day" : (dayMonth == -1 ? "last-month-day" : "next-month-day"));
         if(date  == cur_date.getDate()) divDay.classList.add("cur-day");
         divDay.title = WEEKDAYS[weekday] ;
-        divDay.innerHTML = "<span>"+date+"</span>"
+        divDay.innerHTML = "<span>"+date+"</span><div style='display:none;'>"+date+"</div>"
 
+        divDay.onclick = () =>{if(cb_onclick) cb_onclick(divDay);}
         return divDay;
     }
     let weekdayIter = 0;
