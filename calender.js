@@ -1,14 +1,37 @@
-function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date-simple", lang="de", cb_dayFieldClick=null){
+function initCalender(id="calender", cur_date = new Date(), fixedYear=undefined, cssDateStyle = "date-simple", lang="de", cb_dayFieldClick=null){
     let calender = document.getElementById(id);
+
+    if(calender == undefined){
+        console.error("calender div not found by given id "+id+" => calender is undefined => abort calender initalization!");
+        return;
+    }
+
     const TODAY = new Date();
     
     const isLeapYear = (year) => ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
     const MONTHS_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31};
     
-    const getKw = (date) => {
-        const jan1st = new Date(date.getFullYear(), 0, 1);
-        jan1st.setDate(jan1st.getDate() + (jan1st.getDay() % 7));
-        return Math.round((date - jan1st) / (7 * 24 * 3600 * 1000));
+    const getKw = (date_) => {
+        var date = new Date(date_.getTime());
+
+        date.setHours(0, 0, 0, 0);
+        // const jan1st = new Date(date.getFullYear(), 0, 1);
+        // jan1st.setDate(jan1st.getDate() + (jan1st.getDay() % 7));
+        // return Math.round((date - jan1st) / (7 * 24 * 3600 * 1000));
+
+        // Thursday in current week decides the year.
+      
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+      
+        // January 4 is always in week 1.
+      
+        var week1 = new Date(date.getFullYear(), 0, 4);
+      
+        // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+      
+        return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000
+      
+                              - 3 + (week1.getDay() + 6) % 7) / 7);
       };
 
     
@@ -40,8 +63,15 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
     control.innerHTML = "<div><select id='"+selMonthId+"'></select><select id='"+selYearId+"'></select></div>";
     control.innerHTML += "<div><i></i></div>"
 
-    WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option seleceted value="+WORDS['months'].indexOf(el)+" "+(WORDS['months'].indexOf(el) == cur_date.getMonth() ? 'selected' : '')+">"+el+"</option>");
+    WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+WORDS['months'].indexOf(el)+" "+(WORDS['months'].indexOf(el) == cur_date.getMonth() ? 'selected' : '')+">"+el+"</option>");
+    
     for(let y = 2020; y < 2030; y++){control.firstChild.lastChild.innerHTML += "<option value="+y+" "+(y == cur_date.getFullYear() ? 'selected' : '')+">"+y+"</option>";}
+    if(fixedYear != undefined){
+        control.firstChild.lastChild.style.display ='none';
+        control.firstChild.innerHTML += "<span style='margin-top: 0.3rem; margin-left: 1rem;'>"+fixedYear+"</span>";
+    }
+    
+    
     WORDS['weekdays'].forEach(el =>control.lastChild.innerHTML += "<i>"+el.substring(0,2)+"</i>")
 
     calender.append(control);
@@ -56,14 +86,9 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
 
     function updateCalenderFields(){
 
-        const selYear = document.getElementById(selYearId).value;
+        const selYear = Number(document.getElementById(selYearId).value);
         const selMonth = Number(document.getElementById(selMonthId).value);
         const selMonthDays =  (selMonth == 1 && isLeapYear(selYear) ? 29 : MONTHS_DAYS[selMonth + 1]);
-        
-        tmpDate.setFullYear(selYear);
-        tmpDate.setMonth(selMonth);
-        
-        const firstKwOfMonth = getKw(tmpDate);
 
         function createKwField(cw){
             let divKw = document.createElement("DIV");
@@ -76,7 +101,7 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
             divDay.id = calender.id +"-datefield-"+selYear + "-" +selMonth + "-" + date;
             divDay.classList.add(cssDateStyle);
             divDay.classList.add(dayMonth == 0 ? "cur-month-day" : (dayMonth == -1 ? "last-month-day" : "next-month-day"));
-            if(date  == TODAY.getDate() && selMonth == TODAY.getMonth() && selYear == TODAY.getFullYear()) divDay.classList.add("cur-day");
+            if(date  == TODAY.getDate() && selMonth == TODAY.getMonth() && selYear == TODAY.getFullYear() && dayMonth == 0) divDay.classList.add("cur-day");
             divDay.title = WORDS['weekdays'][weekday-1] ;
             divDay.innerHTML = "<span>"+date+"</span><div style='display:none;'>"+date+"</div>"
     
@@ -85,16 +110,20 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
         }
     
         dates.replaceChildren();
-        
+
+        tmpDate.setFullYear(selYear);
+        tmpDate.setMonth(selMonth);
+        tmpDate.setMonth(selMonth); // q&d: twice otherwiese the month february is considered as march => dont know why yet
         tmpDate.setDate(1);
-        console.log("tmpDate.getTime()", tmpDate.getFullYear(), tmpDate.getMonth(), tmpDate.getDate(), firstKwOfMonth)
+
+        const firstKwOfMonth = getKw(tmpDate);
         
         let firstMonthWeekday = tmpDate.getDay()-1;
         firstMonthWeekday = (firstMonthWeekday == -1 ? 6 : firstMonthWeekday) + 1;
+
         tmpDate.setDate(0)
         const lastMonthDay = tmpDate.getDate();
         
-        console.log(firstKwOfMonth, firstMonthWeekday, selMonthDays)
         
         let dateCounter = 0;
         let weekdayIter = 1;
@@ -106,7 +135,7 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
             let date = (lastMonthDay+1) - weekdayIter;
             dates.prepend(createDayField(date, weekdayIter, -1));
         }
-        
+
         dates.prepend(createKwField(firstKwOfMonth));
 
         let dayMonthIndicator = 0;
@@ -131,6 +160,9 @@ function initCalender(id="calender", cur_date = new Date(), cssDateStyle = "date
     updateCalenderFields();
 
     control.firstChild.firstChild.onchange = (ev) =>{
+        updateCalenderFields();
+    }
+    control.firstChild.lastChild.onchange = (ev) =>{
         updateCalenderFields();
     }
 
