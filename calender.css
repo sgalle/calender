@@ -2,7 +2,8 @@
 :root{
     --default-color: black;
     --default-bg-color: white;
-    --field-sundays-bg-color: rgb(178, 194, 194);
+    --field-sundays-bg-color: rgb(180, 200, 200);
+    --field-saturday-bg-color: rgb(180, 200, 200);
     --field-other-months-bg-color: rgb(121, 119, 119,0.7);
     --field-other-months-color: white;
     --field-border-color: transparent;
@@ -45,6 +46,9 @@ body{
 }
 .dates > div:nth-child(8n){
     background-color: var(--field-sundays-bg-color);
+}
+.dates > div:nth-child(8n-1){
+    background-color: var(--field-saturday-bg-color);
 }
 .dates > div > span{
     user-select: none;

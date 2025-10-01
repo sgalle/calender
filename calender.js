@@ -1,58 +1,103 @@
-function initCalender(id="calender", cur_date = new Date(), fixedYear=undefined, cssDateStyle = "date-simple", lang="de", cb_dayFieldClick=null){
+function initCalender(id="calender", config = {}){
     let calender = document.getElementById(id);
+
+    const TODAY = new Date();
+    const DEFAULT_LANG = 'de';
+    const MONTHS_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31};
 
     if(calender == undefined){
         console.error("calender div not found by given id "+id+" => calender is undefined => abort calender initalization!");
         return;
     }
+    function validateConfigWords(words){
+        const wordsConf = Object.getOwnPropertyNames(words);
+        const wordsKeyConstraints = ['weekdays', 'months', 'cw'];
+        
+        let validWordConfig = true;
+        
+        wordsKeyConstraints.forEach(el => {
+            if(!wordsConf.includes(el))
+            {
+                console.warn("invalid given words config: missing: "+ el + " => using default language "+ DEFAULT_LANG);
+                validWordConfig = false;
+                return;
+            }
+            switch(el){
+                case 'months':
+                case 'weekdays':
+                    const sizeValidation = (el == 'weekdays' ? 7 : 12);
+                    if(!Array.isArray(words[el] ) || words[el].length != sizeValidation){
+                        console.warn("invalid given words config: "+el+" is no array or length != "+sizeValidation+" => ", words[el]);
+                        validWordConfig = false;
+                        return;
+                    } 
+                    break;
+                case 'cw':
+            }
+        });
 
-    const TODAY = new Date();
+         if(validWordConfig) return undefined;
+
+        return words;        
+    }
+
+    const givenConfig = Object.getOwnPropertyNames(config);
+
+    const curDate = givenConfig.includes('curDate') ? config['curDate'] : new Date();
+    const fixedYear = givenConfig.includes('fixedYear') ? config['fixedYear'] : undefined;
+    const cssDateStyle = givenConfig.includes('cssDateStyle') ? config['cssDateStyle'] : "date-simple";
+    const lang = givenConfig.includes('lang') ? config['lang'] : DEFAULT_LANG;
+    const cb_dayFieldClick = givenConfig.includes('cb_dayFieldClick') ? config['cb_dayFieldClick'] : null;
+    const words = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;
     
     const isLeapYear = (year) => ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
-    const MONTHS_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31};
+   
     
     const getKw = (date_) => {
-        var date = new Date(date_.getTime());
+        let date = new Date(date_.getTime());
 
         date.setHours(0, 0, 0, 0);
-        // const jan1st = new Date(date.getFullYear(), 0, 1);
-        // jan1st.setDate(jan1st.getDate() + (jan1st.getDay() % 7));
-        // return Math.round((date - jan1st) / (7 * 24 * 3600 * 1000));
-
-        // Thursday in current week decides the year.
-      
         date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
       
-        // January 4 is always in week 1.
-      
-        var week1 = new Date(date.getFullYear(), 0, 4);
-      
-        // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-      
-        return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000
-      
-                              - 3 + (week1.getDay() + 6) % 7) / 7);
+        let week1 = new Date(date.getFullYear(), 0, 4);
+     
+        return 1 + Math.round(((date.getTime() - week1.getTime()) / (24 * 3600 * 1000) - 3 + (week1.getDay() + 6) % 7) / 7);
       };
 
     
-    const WORDS_DE = {'weekdays' : ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag']
-        , 'months' : ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September','Oktober','November','Dezember']
+    const WORDS_DE = {'weekdays' : ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
+        , 'months' : ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
         , 'cw' : 'KW'
     };
 
-    const WORDS_ENG = {'weekdays' : ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-        , 'months' : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October','November','December']
+    const WORDS_EN = {'weekdays' : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        , 'months' : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         , 'cw' : 'CW'
     };
 
-    let WORDS = WORDS_DE;
+    let WORDS = words;
 
-    switch(lang){
-        case 'eng':
-            WORDS = WORDS_ENG;
-            break;
-        default:
+    if(WORDS == undefined){
+        switch(lang){
+            case 'en':
+                WORDS = WORDS_EN;
+                break;
+            default:
+                WORDS = WORDS_DE;
+                break;
+        }
     }
+    if(!WORDS.hasOwnProperty('weekdays_short')){
+        WORDS['weekdays_short'] = [];
+        WORDS['weekdays'].forEach(el =>  WORDS['weekdays_short'].push(el.substring(0,2)));
+    }
+    if(!WORDS.hasOwnProperty('months_short')){
+        WORDS['months_short'] = [];
+        WORDS['months'].forEach(el =>  WORDS['months_short'].push(el.substring(0,3)));
+    }
+
+    console.log(WORDS)
+
     document.documentElement.style.setProperty('--prefix-CW', "'"+WORDS['cw']+"'");
 
     const selMonthId = "sel_"+calender.id + "_month";
@@ -63,16 +108,16 @@ function initCalender(id="calender", cur_date = new Date(), fixedYear=undefined,
     control.innerHTML = "<div><select id='"+selMonthId+"'></select><select id='"+selYearId+"'></select></div>";
     control.innerHTML += "<div><i></i></div>"
 
-    WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+WORDS['months'].indexOf(el)+" "+(WORDS['months'].indexOf(el) == cur_date.getMonth() ? 'selected' : '')+">"+el+"</option>");
+    WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+WORDS['months'].indexOf(el)+" "+(WORDS['months'].indexOf(el) == curDate.getMonth() ? 'selected' : '')+">"+el+"</option>");
     
-    for(let y = 2020; y < 2030; y++){control.firstChild.lastChild.innerHTML += "<option value="+y+" "+(y == cur_date.getFullYear() ? 'selected' : '')+">"+y+"</option>";}
+    for(let y = 2020; y < 2030; y++){control.firstChild.lastChild.innerHTML += "<option value="+y+" "+(y == curDate.getFullYear() ? 'selected' : '')+">"+y+"</option>";}
     if(fixedYear != undefined){
         control.firstChild.lastChild.style.display ='none';
         control.firstChild.innerHTML += "<span style='margin-top: 0.3rem; margin-left: 1rem;'>"+fixedYear+"</span>";
     }
     
     
-    WORDS['weekdays'].forEach(el =>control.lastChild.innerHTML += "<i>"+el.substring(0,2)+"</i>")
+    WORDS['weekdays_short'].forEach(el =>control.lastChild.innerHTML += "<i>"+el+"</i>")
 
     calender.append(control);
 
@@ -167,4 +212,4 @@ function initCalender(id="calender", cur_date = new Date(), fixedYear=undefined,
     }
 
 }
-initCalender();
+initCalender("calender", {'lang':'en'});
