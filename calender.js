@@ -153,7 +153,7 @@ function initCalender(id="calender", config = {}){
         selDate.setMonth(selMonth); // q&d: twice otherwise the month february is considered as march for prev month and cws => dont know why yet
         selDate.setDate(1);
 
-        const firstKwOfMonth = getCwByDate(selDate);
+        let firstCwOfMonth = getCwByDate(selDate);
         
         let firstMonthWeekday = selDate.getDay()-1;
         firstMonthWeekday = (firstMonthWeekday == -1 ? 6 : firstMonthWeekday) + 1;
@@ -173,14 +173,15 @@ function initCalender(id="calender", config = {}){
             divDates.prepend(createDayField(date, weekdayIter, -1));
         }
 
-        divDates.prepend(createKwField(firstKwOfMonth));
+        divDates.prepend(createKwField(firstCwOfMonth));
+
+        firstCwOfMonth = (selMonth == 0 && firstCwOfMonth > 1 ? 0 : firstCwOfMonth); // edge case when jan 1st is not first in first calender week
 
         let dayMonthIndicator = 0;
         for(let row=0; row < 6;row++){
             for(let weekday = weekdayIter; weekday <= 7; weekday++){
                 if(weekday == 0){
-                    // console.log(firstKwOfMonth, row)
-                    divDates.append(createKwField(firstKwOfMonth+row));
+                    divDates.append(createKwField(firstCwOfMonth+row));
                     continue
                 }
                 if(dateCounter < selMonthDays){
