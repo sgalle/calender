@@ -71,6 +71,7 @@ function initCalender(id="calender", config = {}){
     const fixedYear = givenConfig.includes('fixedYear') ? config['fixedYear'] : undefined;
     const cssDateStyle = givenConfig.includes('cssDateStyle') ? config['cssDateStyle'] : "date-simple";
     const lang = givenConfig.includes('lang') ? config['lang'] : DEFAULT_LANG;
+    const showCwTxt = givenConfig.includes('showCwTxt') ? Boolean(config['showCwTxt']) : true;
     const cb_dayFieldClick = givenConfig.includes('cb_dayFieldClick') ? config['cb_dayFieldClick'] : null;
 
     let CALENDER_WORDS = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;
@@ -94,7 +95,7 @@ function initCalender(id="calender", config = {}){
         CALENDER_WORDS['months'].forEach(el =>  CALENDER_WORDS['months_short'].push(el.substring(0,3)));
     }
 
-    document.documentElement.style.setProperty('--prefix-CW', "'"+CALENDER_WORDS['cw']+"'");
+    if(showCwTxt) document.documentElement.style.setProperty('--prefix-CW', "'"+CALENDER_WORDS['cw']+"'");
 
     let control = document.createElement("DIV");
     control.classList.add("control");
@@ -125,7 +126,25 @@ function initCalender(id="calender", config = {}){
 
         const selYear = Number(document.getElementById(selYearId).value);
         const selMonth = Number(document.getElementById(selMonthId).value);
-        const selMonthDays =  (selMonth == 1 && isLeapYear(selYear) ? 29 : MONTHS_DAYS[selMonth + 1]);
+        const selMonthDays = (selMonth == 1 && isLeapYear(selYear) ? 29 : MONTHS_DAYS[selMonth + 1]);
+
+        divDates.replaceChildren();
+
+        selDate.setFullYear(selYear);
+        selDate.setMonth(selMonth);
+        selDate.setMonth(selMonth); // q&d: twice otherwise the month february is considered as march for prev month and cws => dont know why yet
+        selDate.setDate(1);
+        let firstCwOfMonth = getCwByDate(selDate);
+        let firstMonthWeekday = selDate.getDay()-1;
+        firstMonthWeekday = (firstMonthWeekday == -1 ? 6 : firstMonthWeekday) + 1;
+        
+        selDate.setDate(selMonthDays);
+        let lastMonthWeekday = selDate.getDay()-1;
+        lastMonthWeekday = (lastMonthWeekday == -1 ? 6 : lastMonthWeekday) + 1;
+        
+        selDate.setDate(0);
+        const lastMonthDay = selDate.getDate();
+
 
         function createKwField(cw){
             let divKw = document.createElement("DIV");
@@ -146,22 +165,6 @@ function initCalender(id="calender", config = {}){
             return divDay;
         }
     
-        divDates.replaceChildren();
-
-        selDate.setFullYear(selYear);
-        selDate.setMonth(selMonth);
-        selDate.setMonth(selMonth); // q&d: twice otherwise the month february is considered as march for prev month and cws => dont know why yet
-        selDate.setDate(1);
-
-        let firstCwOfMonth = getCwByDate(selDate);
-        
-        let firstMonthWeekday = selDate.getDay()-1;
-        firstMonthWeekday = (firstMonthWeekday == -1 ? 6 : firstMonthWeekday) + 1;
-
-        selDate.setDate(0)
-        const lastMonthDay = selDate.getDate();
-        
-        
         let dateCounter = 0;
         let weekdayIter = 1;
 
@@ -181,7 +184,9 @@ function initCalender(id="calender", config = {}){
         for(let row=0; row < 6;row++){
             for(let weekday = weekdayIter; weekday <= 7; weekday++){
                 if(weekday == 0){
-                    divDates.append(createKwField(firstCwOfMonth+row));
+                    let cw = firstCwOfMonth+row;
+                    cw = (cw < 53 ? cw : (lastMonthWeekday > 3 ? (dateCounter > 25 && dateCounter < selMonthDays ? 53 : 1) : dateCounter > 2 && dateCounter < 10  ? 2 :1) ); // edge case overlap of cw into next year 
+                    divDates.append(createKwField(cw));
                     continue
                 }
                 if(dateCounter < selMonthDays){
@@ -207,8 +212,6 @@ function initCalender(id="calender", config = {}){
 
 }
 //_________________________________________________________________________________________________
-initCalender();
-console.log( )
-
-
+initCalender('calender', {});
+// initCalender('calender', {'showCwTxt':false});
 //_________________________________________________________________________________________________

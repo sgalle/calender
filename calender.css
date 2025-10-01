@@ -7,7 +7,7 @@
     --field-other-months-bg-color: rgb(121, 119, 119,0.7);
     --field-other-months-color: white;
     --field-border-color: transparent;
-    --prefix-CW: 'KW';
+    --prefix-CW: '';
 }
 .dates{
     display: grid;
@@ -98,6 +98,8 @@
     border-style: none;
     cursor: pointer;
     border-radius: 50%;
+    padding: 0;
+    margin-bottom: 0.25rem;
 }
 .control > div > button:hover{
     transform: scale(1.5);
