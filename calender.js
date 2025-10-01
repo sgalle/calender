@@ -198,5 +198,6 @@ function initCalender(id="calender", config = {}){
     control.firstChild.firstChild.onchange = (ev) =>{updateCalenderFields();}
     control.firstChild.lastChild.onchange = (ev) =>{updateCalenderFields();}
 }
+//_________________________________________________________________________________________________
 initCalender();
 //_________________________________________________________________________________________________
