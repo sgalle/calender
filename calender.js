@@ -62,6 +62,9 @@ function initCalender(id="calender", config = {}){
         console.error("calender div not found by given id "+id+" => calender is undefined => abort calender initalization!");
         return;
     }
+    const selMonthId = "sel_"+calender.id + "_month";
+    const selYearId = "sel_"+calender.id + "_year";
+    const curDecade = Number(String(TODAY.getFullYear()).substring(0,3) + "0");
 
     const givenConfig = Object.getOwnPropertyNames(config);
     const curDate = givenConfig.includes('curDate') ? config['curDate'] : new Date();
@@ -70,7 +73,7 @@ function initCalender(id="calender", config = {}){
     const lang = givenConfig.includes('lang') ? config['lang'] : DEFAULT_LANG;
     const cb_dayFieldClick = givenConfig.includes('cb_dayFieldClick') ? config['cb_dayFieldClick'] : null;
 
-    let CALENDER_WORDS = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;;
+    let CALENDER_WORDS = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;
 
     if(CALENDER_WORDS == undefined){
         switch(lang){
@@ -93,9 +96,6 @@ function initCalender(id="calender", config = {}){
 
     document.documentElement.style.setProperty('--prefix-CW', "'"+CALENDER_WORDS['cw']+"'");
 
-    const selMonthId = "sel_"+calender.id + "_month";
-    const selYearId = "sel_"+calender.id + "_year";
-
     let control = document.createElement("DIV");
     control.classList.add("control");
     control.innerHTML = "<div><select id='"+selMonthId+"'></select><select id='"+selYearId+"'></select></div>";
@@ -103,7 +103,7 @@ function initCalender(id="calender", config = {}){
 
     CALENDER_WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+CALENDER_WORDS['months'].indexOf(el)+" "+(CALENDER_WORDS['months'].indexOf(el) == curDate.getMonth() ? 'selected' : '')+">"+el+"</option>");
     
-    for(let y = 2020; y < 2030; y++){control.firstChild.lastChild.innerHTML += "<option value="+y+" "+(y == curDate.getFullYear() ? 'selected' : '')+">"+y+"</option>";}
+    for(let y = curDecade; y < curDecade+10; y++){control.firstChild.lastChild.innerHTML += "<option value="+y+" "+(y == curDate.getFullYear() ? 'selected' : '')+">"+y+"</option>";}
     if(fixedYear != undefined){
         control.firstChild.lastChild.style.display ='none';
         control.firstChild.innerHTML += "<span style='margin-top: 0.3rem; margin-left: 1rem;'>"+fixedYear+"</span>";
@@ -207,4 +207,7 @@ function initCalender(id="calender", config = {}){
 }
 //_________________________________________________________________________________________________
 initCalender();
+console.log( )
+
+
 //_________________________________________________________________________________________________
