@@ -9,9 +9,6 @@
     --field-border-color: transparent;
     --prefix-CW: 'KW';
 }
-body{
-    background-color: rgb(110, 92, 92);
-}
 .dates{
     display: grid;
     grid-template-columns: 1.5rem repeat(7, auto);
@@ -94,6 +91,16 @@ body{
 }
 .control > div{
     display: grid;
+    user-select: none;
+}
+.control > div > button{
+    background-color: transparent;
+    border-style: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+.control > div > button:hover{
+    transform: scale(1.5);
 }
 .control > div:first-child{
     justify-content: center;
@@ -109,14 +116,10 @@ body{
     justify-items: center;
     align-items: end;
 }
-.cur-day{
-}
 .cur-day > span, .cur-day > div{
     text-decoration: underline;
     font-weight: bolder;
     text-decoration-style: double;
     font-size: larger;
     position: absolute;
-}
-main{
 }

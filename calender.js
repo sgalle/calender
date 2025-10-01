@@ -4,10 +4,12 @@ const MONTHS_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31
 const CALENDER_WORDS_DE = {'weekdays' : ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
     , 'months' : ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
     , 'cw' : 'KW'
+    , 'today' : 'Heute'
 };
 const CALENDER_WORDS_EN = {'weekdays' : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     , 'months' : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     , 'cw' : 'CW'
+    , 'today' : 'Today'
 };
 
 //_________________________________________________________________________________________________
@@ -28,7 +30,7 @@ const getCwByDate = (date_) => {
 //_________________________________________________________________________________________________
 function validateConfigWords(words){
     const wordsConf = Object.getOwnPropertyNames(words);
-    const wordsKeyConstraints = ['weekdays', 'months', 'cw'];
+    const wordsKeyConstraints =  Object.getOwnPropertyNames(CALENDER_WORDS_DE);
     
     for(let i = 0; i < wordsKeyConstraints.length; i++){
         let wkey = wordsKeyConstraints[i];
@@ -67,9 +69,8 @@ function initCalender(id="calender", config = {}){
     const cssDateStyle = givenConfig.includes('cssDateStyle') ? config['cssDateStyle'] : "date-simple";
     const lang = givenConfig.includes('lang') ? config['lang'] : DEFAULT_LANG;
     const cb_dayFieldClick = givenConfig.includes('cb_dayFieldClick') ? config['cb_dayFieldClick'] : null;
-    const words = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;
 
-    let CALENDER_WORDS = words;
+    let CALENDER_WORDS = givenConfig.includes('words') ? validateConfigWords(config['words']) : undefined;;
 
     if(CALENDER_WORDS == undefined){
         switch(lang){
@@ -98,7 +99,7 @@ function initCalender(id="calender", config = {}){
     let control = document.createElement("DIV");
     control.classList.add("control");
     control.innerHTML = "<div><select id='"+selMonthId+"'></select><select id='"+selYearId+"'></select></div>";
-    control.innerHTML += "<div><i></i></div>"
+    control.innerHTML += "<div><button title='"+CALENDER_WORDS['today']+"'>⦾</button></div>"
 
     CALENDER_WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+CALENDER_WORDS['months'].indexOf(el)+" "+(CALENDER_WORDS['months'].indexOf(el) == curDate.getMonth() ? 'selected' : '')+">"+el+"</option>");
     
@@ -112,13 +113,13 @@ function initCalender(id="calender", config = {}){
 
     calender.append(control);
 
-    let dates = document.createElement("DIV");
-    dates.id = calender.id + "_divDates";
-    dates.classList.add("dates");
-    dates.classList.add("date-simple");
-    calender.append(dates);
+    let divDates = document.createElement("DIV");
+    divDates.id = calender.id + "_divDates";
+    divDates.classList.add("dates");
+    divDates.classList.add("date-simple");
+    calender.append(divDates);
 
-    let tmpDate = new Date();
+    let selDate = new Date();
 
     function updateCalenderFields(){
 
@@ -145,20 +146,20 @@ function initCalender(id="calender", config = {}){
             return divDay;
         }
     
-        dates.replaceChildren();
+        divDates.replaceChildren();
 
-        tmpDate.setFullYear(selYear);
-        tmpDate.setMonth(selMonth);
-        tmpDate.setMonth(selMonth); // q&d: twice otherwise the month february is considered as march for prev month and cws => dont know why yet
-        tmpDate.setDate(1);
+        selDate.setFullYear(selYear);
+        selDate.setMonth(selMonth);
+        selDate.setMonth(selMonth); // q&d: twice otherwise the month february is considered as march for prev month and cws => dont know why yet
+        selDate.setDate(1);
 
-        const firstKwOfMonth = getCwByDate(tmpDate);
+        const firstKwOfMonth = getCwByDate(selDate);
         
-        let firstMonthWeekday = tmpDate.getDay()-1;
+        let firstMonthWeekday = selDate.getDay()-1;
         firstMonthWeekday = (firstMonthWeekday == -1 ? 6 : firstMonthWeekday) + 1;
 
-        tmpDate.setDate(0)
-        const lastMonthDay = tmpDate.getDate();
+        selDate.setDate(0)
+        const lastMonthDay = selDate.getDate();
         
         
         let dateCounter = 0;
@@ -169,17 +170,17 @@ function initCalender(id="calender", config = {}){
                 break;
 
             let date = (lastMonthDay+1) - weekdayIter;
-            dates.prepend(createDayField(date, weekdayIter, -1));
+            divDates.prepend(createDayField(date, weekdayIter, -1));
         }
 
-        dates.prepend(createKwField(firstKwOfMonth));
+        divDates.prepend(createKwField(firstKwOfMonth));
 
         let dayMonthIndicator = 0;
         for(let row=0; row < 6;row++){
             for(let weekday = weekdayIter; weekday <= 7; weekday++){
                 if(weekday == 0){
                     // console.log(firstKwOfMonth, row)
-                    dates.append(createKwField(firstKwOfMonth+row));
+                    divDates.append(createKwField(firstKwOfMonth+row));
                     continue
                 }
                 if(dateCounter < selMonthDays){
@@ -188,7 +189,7 @@ function initCalender(id="calender", config = {}){
                     dateCounter = 1;
                     dayMonthIndicator = 1
                 }
-                dates.append(createDayField(dateCounter, weekday, dayMonthIndicator));
+                divDates.append(createDayField(dateCounter, weekday, dayMonthIndicator));
             }
             weekdayIter = 0;
         }
@@ -197,6 +198,12 @@ function initCalender(id="calender", config = {}){
 
     control.firstChild.firstChild.onchange = (ev) =>{updateCalenderFields();}
     control.firstChild.lastChild.onchange = (ev) =>{updateCalenderFields();}
+    control.lastChild.firstChild.onclick = () =>{
+        document.getElementById(selMonthId).value = TODAY.getMonth();
+        document.getElementById(selYearId).value = TODAY.getFullYear();
+        updateCalenderFields();
+    }
+
 }
 //_________________________________________________________________________________________________
 initCalender();
