@@ -1,3 +1,13 @@
+/**
+ * @link https://github.com/sgalle/calender
+ * @version 0.9
+ * @author sgalle
+ * @copyright 2025 sgalle
+ * @license MIT
+ */
+!function(){
+    "use strict";
+//_________________________________________________________________________________________________
 const TODAY = new Date();
 const DEFAULT_LANG = 'de';
 const MONTHS_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31};
@@ -215,3 +225,4 @@ function initCalender(id="calender", config = {}){
 initCalender('calender', {});
 // initCalender('calender', {'showCwTxt':false});
 //_________________________________________________________________________________________________
+}();
