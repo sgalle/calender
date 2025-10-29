@@ -5,7 +5,7 @@
  * @copyright 2025 sgalle
  * @license MIT
  */
-!function(){
+(function(){
     "use strict";
 //_________________________________________________________________________________________________
 const TODAY = new Date();
@@ -65,7 +65,7 @@ function validateConfigWords(words){
 }
 
 //_________________________________________________________________________________________________
-function initCalender(id="calender", config = {}){
+var initCalender = function(id="calender", config = {}){
     let calender = document.getElementById(id);
 
     if(calender == undefined){
@@ -222,7 +222,8 @@ function initCalender(id="calender", config = {}){
 
 }
 //_________________________________________________________________________________________________
-initCalender('calender', {});
+window.initCalender = initCalender;
+// initCalender('calender', {});
 // initCalender('calender', {'showCwTxt':false});
 //_________________________________________________________________________________________________
-}();
+})();
