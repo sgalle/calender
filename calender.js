@@ -169,7 +169,7 @@ var initCalender = function(id="calender", config = {}){
             divDay.classList.add(dayMonth == 0 ? "cur-month-day" : (dayMonth == -1 ? "last-month-day" : "next-month-day"));
             if(date  == TODAY.getDate() && selMonth == TODAY.getMonth() && selYear == TODAY.getFullYear() && dayMonth == 0) divDay.classList.add("cur-day");
             divDay.title = CALENDER_WORDS['weekdays'][weekday-1] ;
-            divDay.innerHTML = "<span>"+date+"</span><div style='display:none;'>"+date+"</div>"
+            divDay.innerHTML = "<span>"+date+"</span><div style='display:none;'><span>"+date+"</span></div>"
     
             divDay.onclick = () =>{if(cb_onclick) cb_onclick(divDay);}
             return divDay;
