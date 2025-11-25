@@ -164,7 +164,7 @@ var initCalender = function(id="calender", config = {}){
         function createDayField(date, weekday, dayMonth=0, cb_onclick=cb_dayFieldClick){
             let divDay = document.createElement("DIV");
     
-            divDay.id = calender.id +"-datefield-"+selYear + "-" +(selMonth+1) + "-" + (date < 10 ? "0" : "") + date;
+            divDay.id = calender.id +"-datefield-"+selYear + "-" + (selMonth < 10 ? "0" : "") + (selMonth+1) + "-" + (date < 10 ? "0" : "") + date;
             divDay.classList.add(cssDateStyle);
             divDay.classList.add(dayMonth == 0 ? "cur-month-day" : (dayMonth == -1 ? "last-month-day" : "next-month-day"));
             if(date  == TODAY.getDate() && selMonth == TODAY.getMonth() && selYear == TODAY.getFullYear() && dayMonth == 0) divDay.classList.add("cur-day");
