@@ -110,7 +110,7 @@ var initCalender = function(id="calender", config = {}){
     let control = document.createElement("DIV");
     control.classList.add("control");
     control.innerHTML = "<div><select id='"+selMonthId+"'></select><select id='"+selYearId+"'></select></div>";
-    control.innerHTML += "<div><button title='"+CALENDER_WORDS['today']+"'>⦾</button></div>"
+    control.innerHTML += "<div><button id='btn_showToday' title='"+CALENDER_WORDS['today']+"'>⦾</button></div>"
 
     CALENDER_WORDS['months'].forEach(el =>control.firstChild.firstChild.innerHTML += "<option value="+CALENDER_WORDS['months'].indexOf(el)+" "+(CALENDER_WORDS['months'].indexOf(el) == curDate.getMonth() ? 'selected' : '')+">"+el+"</option>");
     
